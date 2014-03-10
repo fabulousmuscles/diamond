@@ -1,0 +1,6 @@
+*.pyc
+
+covers/
+detail_file.txt
+diamond.txt
+diamond2.txt
