@@ -14,6 +14,7 @@ NEXT_WEEK = '{0.month}.{0.day}.{0.year}'.format(d_next)
 NEXT_WEEK_SLASH = '{0.month}/{0.day}/{0.year}'.format(d_next)
 NEXT_WEEK_VAR = d_next.strftime('%m/%d/%y')
 
+# names of the temp files
 DIAMOND = './diamond.txt'
 DIAMOND2 = './diamond2.txt'
 
@@ -21,6 +22,7 @@ regex_block = lambda regex, content: ''.join(re.findall(regex, content))
 
 
 def get_links():
+    """Get a list of all of the comic book links on the main page."""
     myreader = MyReader()
     diamond = myreader.read_it('http://www.previewsworld.com/Home/1/1/71/954')
 
@@ -34,6 +36,7 @@ def get_links():
     mag = 2
     htmlc = 0
 
+    # We don't mechandise, magazines, etc.
     with open(DIAMOND) as f:
         for line in f:
             if '<h2 align="center">PREMIER PUBLISHERS</h2>' in line:
@@ -55,6 +58,7 @@ def get_links():
 
 
 def get_detail_page(link):
+    """Fetch the detail page and remove some of the tags."""
     myreader = MyReader()
     detail_page = myreader.read_it(link)
     if not detail_page:
@@ -71,6 +75,7 @@ def get_detail_page(link):
 
 
 def get_image(detail_file, detail_page, _id):
+    """Fetch the image and save it locally."""
     outpath = os.path.join('./covers/', NEXT_WEEK, _id + '.jpg')
     path = regex_block('"FancyPopupImage" href="(/\w\S+)"', detail_page)
     image_url = 'http://www.previewsworld.com' + path
@@ -84,6 +89,11 @@ def get_image(detail_file, detail_page, _id):
 
 
 def get_details(detail_file, detail_page, count):
+    """
+    Use regular expressions to grab the data we want out of the
+    detail_page and save it to detail_file. Then return _id, which
+    will be used to save the cover image associated with this comic.
+    """
     regex_dict = {
         '<TITLE>': '<meta property="og:title" content="([^<]+)"',
         '<PUBLISHER>': 'Publisher:&nbsp;([^<]+)<',
@@ -106,6 +116,7 @@ def get_details(detail_file, detail_page, count):
 
 
 def clean_up():
+    """Delete the temp files."""
     try:
         os.remove(DIAMOND)
         os.remove(DIAMOND2)
@@ -117,6 +128,7 @@ def clean_up():
 
 
 def makepath():
+    """Create the path where the comic covers will be stored."""
     path = os.path.join('./covers/', NEXT_WEEK)
     try:
         os.makedirs(path)
